@@ -1,4 +1,4 @@
-import math
+import time
 inp_real="""99264478406: 992 644 774 2 2 984
 2943071040: 5 98 940 99 767 8 420
 40100695446: 13 44 75 9 2 7 7 5 438 7
@@ -876,7 +876,6 @@ for line in lines:
 
 def is_ending_substring(string_to_search: str, ending_substring: str):
     idx = string_to_search.rfind(ending_substring)
-    print(f"found idx {idx}")
     if idx == -1:
         return False
     return idx+len(ending_substring) == len(string_to_search)
@@ -889,12 +888,9 @@ def is_possibly_true(answer,potVals):
     if len(potVals) == 2:
         return answer == potVals[0]*potVals[1] or answer == potVals[0]+potVals[1] or answer == int(f"{potVals[0]}{potVals[1]}")
 
-    print(f"\nstr(answer),str(potVals[-1]){str(answer),str(potVals[-1])} IS_ENDING_SUBSTR {is_ending_substring(str(answer),str(potVals[-1]))}\n")
     if is_ending_substring(str(answer),str(potVals[-1])):
-        print(str(answer), str(potVals[-1]))
         new_answer_string = str(answer)[:str(answer).rfind(str(potVals[-1]))]
         if new_answer_string != "":
-            print(new_answer_string)
             new_answer = int(new_answer_string)
             if is_possibly_true(new_answer,potVals[:-1]):
                 return True
@@ -904,12 +900,12 @@ def is_possibly_true(answer,potVals):
             return True
     
     return is_possibly_true(answer-potVals[-1], potVals[:-1]) 
-
+start = time.time()
 res = 0
 for eq in equations:
     [answer, potVals] = eq
-    print(answer, potVals)
     if is_possibly_true(answer,potVals):
-        print("isTrue", is_possibly_true(answer,potVals))
         res += answer
-print(res)
+end = time.time()
+print(f"end {end}")
+print(f"time elapsed {end-start}")
