@@ -250,97 +250,54 @@ def find_perimeter_given_region(region):
     for coord in region:
         [left, right, up, down] = [get_left_coord(coord),get_right_coord(coord),get_up_coord(coord),get_down_coord(coord)]
         if left not in region:
-            perimeters.append(left)
+            perimeters.append((left,"left"))
         if right not in region:
-            perimeters.append(right)
+            perimeters.append((right,"right"))
         if up not in region:
-            perimeters.append(up)
+            perimeters.append((up,"up"))
         if down not in region:
-            perimeters.append(down)
+            perimeters.append((down,"down"))
 
-    # merge all coords on the same X level
-    differen_sides = []
-    this_q = []
-    this_q.extend(perimeters)
-    while this_q.__len__() > 0:
-        this_start_node = this_q.pop()
-        visited_cells = [this_start_node]
-        to_consider = [this_start_node]
-        while len(to_consider) > 0:
-            curr_consider = to_consider.pop()
-            [left, right] = [get_left_coord(curr_consider),get_right_coord(curr_consider)]
-            for dir in [left,right]:
-                if dir in this_q and not dir in visited_cells:
-                    visited_cells.append(dir)
-                    to_consider.append(dir)
-                    this_q.remove(dir)
-        differen_sides.append(visited_cells)
+    # merge perimeters that are on the same line AND have the same directionality
 
-
-    # we can now get all SINGLE length sides if they differ one in Row value with eachother
-
-    merge_length_one_row_axs = []
-    differen_sides.sort()
-    q = differen_sides
+    fence_pieces = []
+    q = perimeters
     while len(q) > 0:
-        this_side = q.pop()
-        if len(this_side) > 1:
-            merge_length_one_row_axs.append(this_side)
-            continue
-        
-        this_side_merged = this_side
-        doneMerging = False
-        while not doneMerging:
-            doneMerging = True 
-            for other_side in differen_sides:
-                other_side.sort()
-                if len(other_side) > 1:
-                    continue
-                if other_side[0] in this_side_merged:
-                    continue
-                for this_side in this_side_merged:
-                    if (this_side[1] == other_side[0][1] and this_side[0] - 1 == other_side[0][0]) or (this_side[1] == other_side[0][1] and this_side[0] + 1 == other_side[0][0]):
-                        this_side_merged.extend(other_side)
-                        doneMerging = False
-                        q.remove(other_side)
-        
-        merge_length_one_row_axs.append(this_side_merged)
+        current_perim = q.pop()
+        # Note you can only be a fence if you have the same directionality.
+        this_dir = current_perim[1]
+        this_coord = current_perim[0]
+        this_fence_coord_group = [this_coord]
+        poss_fencemates = [p[0] for p in q if p[1] == this_dir]
+        poss_fencemate_search = True
+        while poss_fencemate_search:
+            poss_fencemate_search=False
+            for poss_fencemate in poss_fencemates:
+                if this_dir == "right" or this_dir == "left":
+                    if get_up_coord(poss_fencemate) in this_fence_coord_group or get_down_coord(poss_fencemate)in this_fence_coord_group:
+                        this_fence_coord_group.append(poss_fencemate)
+                        poss_fencemates.remove(poss_fencemate)
+                        q.remove((poss_fencemate,this_dir))
+                        poss_fencemate_search=True
+                if this_dir == "up" or this_dir == "down":
+                    if get_left_coord(poss_fencemate) in this_fence_coord_group or get_right_coord(poss_fencemate)in this_fence_coord_group:
+                        this_fence_coord_group.append(poss_fencemate)
+                        poss_fencemates.remove(poss_fencemate)
+                        q.remove((poss_fencemate,this_dir))
+                        poss_fencemate_search=True
+        fence_pieces.append(this_fence_coord_group)
+
+    for fence_piece in fence_pieces:
+        print("fence piece:",fence_piece)    
+    return len(fence_pieces)
     
-    for side in merge_length_one_row_axs:
-        print("side", side)
+
+            # if dir == "right" or "left", then poss fencemate is only allowed to exist a coord above or coord below.
+
+
     
-    return(len(merge_length_one_row_axs))
 
-
-    # for side in merge_length_one_row_axs:
-        # print("side",side)
-    # print(len(merge_length_one_row_axs))
-    # for side in differen_sides:
-    #     if len(side) > 1:
-    #         merge_length_one_row_axs.append(side)
-    #     else:
-    #         for side_two in differen_sides:
-    #             if side_two == side:
-    #                 continue
-    #             if len(side_two) > 1:
-    #                 continue
-    #             # same col idx or 1 diff row
-    #             if (side[0][1] == side_two[0][1] and side[0][0] - 1 == side_two[0][0]) or (side[0][1] == side_two[0][1] and side[0][0] + 1 == side_two[0][0]):
-    #                 differen_sides.remove(side_two)
-    #                 merge_length_one_row_axs.append([side[0],side_two[0]])
-
-
-
-    # print("differen_sides")
-    # differen_sides.sort()
-    # for region in differen_sides:
-    #     region.sort()
-    #     print("region, ",region)
-        
-
-
-
-    # return len(perimeters)
+    return len(perimeters)
     
 
 total_price = 0
