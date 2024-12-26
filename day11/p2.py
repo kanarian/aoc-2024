@@ -48,8 +48,9 @@ def blink_recursive(counted_vals, n):
 
 
 counted_vals = [(val, 1) for val in vals]
-print(counted_vals)
-
+start = time.time()
 res = blink_recursive(counted_vals,75)
+end = time.time()
+print(f"time took = {end-start}")
 # print("res",res)
 print(f"stones {sum([el[1] for el in res])}")
